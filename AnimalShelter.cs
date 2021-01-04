@@ -1,28 +1,54 @@
 using System;
 using System.Collections.Generic;
 
+using AnimalShelter.Models;
+using AnimalShelter.Storage;
+
 namespace AnimalShelter
 {
     public class AnimalShelterSystem
     {
 
-        private List<Animal> _animals;
-        private List<Patron> _patrons;
+        /*** Storage ***/
+        private IStoreAnimals _animalStorage;
+        private IStoreAdopters _adopterStorage;
+        private IStoreAdoptions _adoptionStorage;
 
-        public AnimalShelterSystem() {
-            _animals = new List<Animal>();
-            _patrons = new List<Patron>();
 
-            var dog1 = new Dog(1, "Charlie", "M", "white");
+        public AnimalShelterSystem(IStoreAnimals animalStorageArg,
+            IStoreAdopters adopterStorageArg,
+            IStoreAdoptions adoptionStorageArg)
+        {
 
-            _animals.Add(dog1);
-            
-            var patron1 = new Patron(1, "Will", "G");
+            _animalStorage = animalStorageArg;
+            _adopterStorage = adopterStorageArg;
+            _adoptionStorage = adoptionStorageArg;
 
-            _patrons.Add(patron1);
+            var dog1 = new Dog("Charlie", "M", "white");
+
+            _animalStorage.Create(dog1);
+
+            var adopter = new Adopter("Will", "G");
+
+            _adopterStorage.Create(adopter);
 
         }
 
+        public Adoption Adopt(Guid aimalId, Guid adopterId)
+        {
+
+            var animal = _animalStorage.GetById(aimalId);
+            var adopter = _adopterStorage.GetById(adopterId);
+
+            var adoption = new Adoption(animal, adopter, DateTime.Now);
+
+
+            _adoptionStorage.Create(adoption);
+
+            return adoption;
+        }
+
+
     }
-   
+
 }
